@@ -6,7 +6,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
 {
     [Header("Movement")]
     private float moveSpeed;
-    private float desiredMoveSpeed;
+    public float desiredMoveSpeed;
     private float lastDesiredMoveSpeed;
     [SerializeField] private float walkSpeed;
     [SerializeField] private float sprintSpeed;
@@ -225,17 +225,14 @@ public class PlayerMovementAdvanced : MonoBehaviour
         // sliding
         else if (sliding)
         {
-            state = MovementState.sliding;
-
             // increases speed by 1 every second
             if (OnSlope()) // && rb.velocity.y < 0.1f
             {
-                desiredMoveSpeed = slideSpeed;
+                state = MovementState.sliding;
                 keepMomentum = true;
-                playerCamera.HandleFov(slideFov, .2f);
             }
-            else
-                desiredMoveSpeed = sprintSpeed;
+            desiredMoveSpeed = slideSpeed;
+            playerCamera.HandleFov(slideFov, .2f);
         }
 
         // crouching
