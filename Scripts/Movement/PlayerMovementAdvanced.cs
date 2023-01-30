@@ -260,9 +260,6 @@ public class PlayerMovementAdvanced : MonoBehaviour
             desiredMoveSpeed = walkSpeed;
         }
 
-        if (grounded && !dashing && !Input.GetKey(sprintKey) && !activeGrapple && !sliding)
-            playerCamera.HandleFov(normalFov, .2f);
-
         // air movement
         else
         {
@@ -273,6 +270,9 @@ public class PlayerMovementAdvanced : MonoBehaviour
             else
                 desiredMoveSpeed = sprintSpeed;
         }
+
+        if (grounded && !dashing && !Input.GetKey(sprintKey) && !activeGrapple && !sliding)
+            playerCamera.HandleFov(normalFov, .2f);
 
         bool desiredMoveSpeedHasChanged = desiredMoveSpeed != lastDesiredMoveSpeed;
         if (lastState == MovementState.dashing) keepMomentum = true;
