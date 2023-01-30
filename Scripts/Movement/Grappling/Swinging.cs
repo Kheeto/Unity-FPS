@@ -17,8 +17,6 @@ public class Swinging : MonoBehaviour
     [Header("Odm Gear")]
     [SerializeField] private float horizontalThrustForce;
     [SerializeField] private float forwardThrustForce;
-    [SerializeField] private float shortenThrustForce;
-    [SerializeField] private float shortenCableSpeed;
     [SerializeField] private float extendCableSpeed;
 
     [Header("Prediction")]
@@ -89,19 +87,22 @@ public class Swinging : MonoBehaviour
     /// </summary>
     private void OdmGearMovement()
     {
-        float vertical = Input.GetAxis("Vertical");
-        float horizontal = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(horizontal * horizontalThrustForce, 0f, vertical * forwardThrustForce);
-
-        rb.AddForce(movement.normalized * Time.deltaTime, ForceMode.Force);
+        // go right
+        if (Input.GetKey(KeyCode.D)) rb.AddForce(orientation.right * horizontalThrustForce * Time.deltaTime);
+        // go left
+        if (Input.GetKey(KeyCode.A)) rb.AddForce(-orientation.right * horizontalThrustForce * Time.deltaTime);
+        // go forward
+        if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * forwardThrustForce * Time.deltaTime);
+        // go backwards
+        if (Input.GetKey(KeyCode.S)) rb.AddForce(-orientation.forward * forwardThrustForce * Time.deltaTime);
 
         // shorten cable
         if (Input.GetKey(shortenKey))
         {
             Vector3 directionToPoint = swingPoint - transform.position;
-            rb.AddForce(directionToPoint.normalized * shortenThrustForce * Time.deltaTime);
+            rb.AddForce(directionToPoint.normalized * forwardThrustForce * Time.deltaTime);
 
-            float distanceFromPoint = Vector3.Distance(transform.position, swingPoint) + shortenCableSpeed;
+            float distanceFromPoint = Vector3.Distance(transform.position, swingPoint);
 
             joint.maxDistance = distanceFromPoint * .8f;
             joint.minDistance = distanceFromPoint * .25f;
