@@ -52,8 +52,11 @@ public class PlayerMovementAdvanced : MonoBehaviour
 
     [Header("Camera Effects")]
     [SerializeField] private PlayerCamera playerCamera;
-    [SerializeField] private float grappleFov = 85f;
     [SerializeField] private float normalFov = 80f;
+    [SerializeField] private float sprintFov = 85f;
+    [SerializeField] private float slideFov = 85f;
+    [SerializeField] private float grappleFov = 90f;
+    [SerializeField] private float dashFov = 90f;
 
     [Header("References")]
     [SerializeField] private Transform orientation;
@@ -225,9 +228,11 @@ public class PlayerMovementAdvanced : MonoBehaviour
             state = MovementState.sliding;
 
             // increases speed by 1 every second
-            if (OnSlope() && rb.velocity.y < 0.1f) {
+            if (OnSlope()) // && rb.velocity.y < 0.1f
+            {
                 desiredMoveSpeed = slideSpeed;
                 keepMomentum = true;
+                playerCamera.HandleFov(slideFov, .2f);
             }
             else
                 desiredMoveSpeed = sprintSpeed;
@@ -245,6 +250,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
         {
             state = MovementState.sprinting;
             desiredMoveSpeed = sprintSpeed;
+            playerCamera.HandleFov(sprintFov, .2f);
         }
 
         // walking
@@ -253,6 +259,9 @@ public class PlayerMovementAdvanced : MonoBehaviour
             state = MovementState.walking;
             desiredMoveSpeed = walkSpeed;
         }
+
+        if (grounded && !dashing && !Input.GetKey(sprintKey) && !activeGrapple && !sliding)
+            playerCamera.HandleFov(normalFov, .2f);
 
         // air movement
         else
@@ -436,7 +445,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
 
     public void ResetRestrictions() { 
         activeGrapple = false;
-        playerCamera.HandleFov(normalFov, .2f);
+        playerCamera.HandleFov(normalFov, .5f);
     }
 
     private void OnCollisionEnter(Collision collision)
