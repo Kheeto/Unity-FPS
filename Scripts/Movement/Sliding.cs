@@ -37,6 +37,8 @@ public class Sliding : MonoBehaviour
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
+        if (pm.swinging || pm.activeGrapple) return;
+
         if (Input.GetKeyDown(slideKey) && (horizontalInput != 0 || verticalInput != 0))
             StartSlide();
 
