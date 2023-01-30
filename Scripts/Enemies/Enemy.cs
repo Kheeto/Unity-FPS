@@ -11,10 +11,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int health;
 
     [Header("Path Finding")]
+    [SerializeField] private LayerMask whatIsGround;
     private Transform player;
     private NavMeshAgent agent;
-    [SerializeField] private LayerMask whatIsGround;
-    Vector3 playerDirection;
+    private Vector3 playerDirection;
 
     [Header("Patroling")]
     [SerializeField] private bool enablePatrol;
@@ -26,15 +26,17 @@ public class Enemy : MonoBehaviour
     private bool walkPointSet;
 
     [Header("Chasing")]
+    [SerializeField] private float sightRange;
     [SerializeField] private float chaseTimeAfterTargetLost = 3f;
+    [SerializeField] private float lookSpeed = .5f;
     private float chaseTimer;
     private bool wasChasing;
     private bool timerWasActive;
 
     [Header("Attacking")]
-    [SerializeField] private float timeBetweenAttacks;
-    [SerializeField] private float sightRange;
     [SerializeField] private float attackRange;
+    [SerializeField] private float timeBetweenAttacks;
+    [SerializeField] private bool canMoveWhileAttacking;
     private bool alreadyAttacked;
     private bool playerInAttackRange;
     private bool playerInSightRange;
@@ -65,8 +67,7 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        // Always look towards the player
-        transform.LookAt(player);
+        playerDirection = player.position - transform.position;
 
         if (chaseTimer > 0) // Chases the target even if it's out of sight for a given time, until it's lost.
         {
@@ -78,7 +79,7 @@ public class Enemy : MonoBehaviour
         {
             // Shoots a raycast to checks if he can see the player
             RaycastHit hit;
-            Physics.Raycast(transform.position, transform.forward, out hit);
+            Physics.Raycast(transform.position, playerDirection, out hit);
 
             // The raycast hit the player and there is no object in between
             if (hit.collider.gameObject.GetComponent<PlayerMovementAdvanced>() != null)
@@ -86,6 +87,11 @@ public class Enemy : MonoBehaviour
                 timerWasActive = false;
                 if (Vector3.Distance(transform.position, player.position) <= sightRange)
                 {
+                    // Look towards the player
+                    Vector3 lookDirection = new Vector3(playerDirection.x, 0f, playerDirection.z);
+                    Quaternion rotation = Quaternion.LookRotation(lookDirection);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rotation, lookSpeed * Time.deltaTime);
+
                     if (Vector3.Distance(transform.position, player.position) <= attackRange)
                     {
                         Attack(); // Player is in both sight range and attack range
@@ -138,8 +144,8 @@ public class Enemy : MonoBehaviour
     private void Attack()
     {
         wasChasing = false;
-        // Makes sure enemy doesn't move while attacking
-        agent.SetDestination(transform.position);
+
+        if (!canMoveWhileAttacking) agent.SetDestination(transform.position);
 
         if (!alreadyAttacked) 
         {
