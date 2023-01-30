@@ -17,6 +17,8 @@ public class Swinging : MonoBehaviour
     [Header("Odm Gear")]
     [SerializeField] private float horizontalThrustForce;
     [SerializeField] private float forwardThrustForce;
+    [SerializeField] private float shortenThrustForce;
+    [SerializeField] private float shortenCableSpeed;
     [SerializeField] private float extendCableSpeed;
 
     [Header("Prediction")]
@@ -26,6 +28,8 @@ public class Swinging : MonoBehaviour
 
     [Header("Input")]
     [SerializeField] private KeyCode swingKey = KeyCode.Mouse1;
+    [SerializeField] private KeyCode shortenKey = KeyCode.Space;
+    [SerializeField] private KeyCode extendKey = KeyCode.LeftShift;
 
     [Header("References")]
     private Rigidbody rb;
@@ -85,27 +89,26 @@ public class Swinging : MonoBehaviour
     /// </summary>
     private void OdmGearMovement()
     {
-        // go right
-        if (Input.GetKey(KeyCode.D)) rb.AddForce(orientation.right * horizontalThrustForce * Time.deltaTime);
-        // go left
-        if (Input.GetKey(KeyCode.A)) rb.AddForce(-orientation.right * horizontalThrustForce * Time.deltaTime);
-        // go forward
-        if (Input.GetKey(KeyCode.W)) rb.AddForce(orientation.forward * forwardThrustForce * Time.deltaTime);
+        float vertical = Input.GetAxis("Vertical");
+        float horizontal = Input.GetAxis("Horizontal");
+        Vector3 movement = new Vector3(horizontal * horizontalThrustForce, 0f, vertical * forwardThrustForce);
+
+        rb.AddForce(movement.normalized * Time.deltaTime, ForceMode.Force);
 
         // shorten cable
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(shortenKey))
         {
             Vector3 directionToPoint = swingPoint - transform.position;
-            rb.AddForce(directionToPoint.normalized * forwardThrustForce * Time.deltaTime);
+            rb.AddForce(directionToPoint.normalized * shortenThrustForce * Time.deltaTime);
 
-            float distanceFromPoint = Vector3.Distance(transform.position, swingPoint);
+            float distanceFromPoint = Vector3.Distance(transform.position, swingPoint) + shortenCableSpeed;
 
             joint.maxDistance = distanceFromPoint * .8f;
             joint.minDistance = distanceFromPoint * .25f;
         }
 
-        // shorten cable
-        if(Input.GetKey(KeyCode.S))
+        // extend cable
+        if(Input.GetKey(extendKey))
         {
             float extendedDistanceFromPoint = Vector3.Distance(transform.position, swingPoint) + extendCableSpeed;
             joint.maxDistance = extendedDistanceFromPoint * .8f;
