@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class Sliding : MonoBehaviour
 {
+    [Header("Sliding")]
+    [SerializeField] private bool slideTimeLimit;
+    [SerializeField] private float maxSlideTime;
+    [SerializeField] private float slideForce;
+    private float slideTimer;
+    [SerializeField] private float slideYScale;
+    private float startYScale;
+
     [Header("References")]
     [SerializeField] private Transform orientation;
     [SerializeField] private Transform playerObj;
     private Rigidbody rb;
     private PlayerMovementAdvanced pm;
-
-    [Header("Sliding")]
-    [SerializeField] private float maxSlideTime;
-    [SerializeField] private float slideForce;
-    private float slideTimer;
-
-    [SerializeField] private float slideYScale;
-    private float startYScale;
 
     [Header("Input")]
     [SerializeField] private KeyCode slideKey = KeyCode.LeftControl;
@@ -77,7 +77,7 @@ public class Sliding : MonoBehaviour
         {
             rb.AddForce(inputDirection.normalized * slideForce, ForceMode.Force);
 
-            slideTimer -= Time.deltaTime;
+            if (slideTimeLimit) slideTimer -= Time.deltaTime;
         }
 
         // sliding down a slope
