@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class Sliding : MonoBehaviour
 {
-    [Header("Sliding")]
-    [SerializeField] private bool slideTimeLimit;
-    [SerializeField] private float maxSlideTime;
-    [SerializeField] private float slideForce;
-    private float slideTimer;
-    [SerializeField] private float slideYScale;
+    [Header("Sliding movement")]
+    [SerializeField] private float slideSpeedDrain = .5f;
+    [SerializeField] private float slideSpeedGain = 1f;
+    [SerializeField] private float slideMoveForce = 10f;
+    [SerializeField] private float slideDownForce = 3000f;
+    [SerializeField] private float slideYScale = .4f;
     private float startYScale;
+
+    [Header("Time Limit")]
+    [SerializeField] private bool slideTimeLimit = false;
+    [SerializeField] private float maxSlideTime = 5f;
+    private float slideTimer;
 
     [Header("References")]
     [SerializeField] private Transform orientation;
@@ -22,6 +27,8 @@ public class Sliding : MonoBehaviour
     [SerializeField] private KeyCode slideKey = KeyCode.LeftControl;
     private float horizontalInput;
     private float verticalInput;
+
+    private bool wasOnSlope;
 
 
     private void Start()
@@ -63,6 +70,8 @@ public class Sliding : MonoBehaviour
         rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
 
         slideTimer = maxSlideTime;
+
+        pm.currentSlideSpeed = pm.slideGroundSpeed;
     }
 
     /// <summary>
@@ -72,10 +81,13 @@ public class Sliding : MonoBehaviour
     {
         Vector3 inputDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        // sliding normal
+        // sliding on a flat surface
         if(!pm.OnSlope() || rb.velocity.y > -0.1f)
         {
-            rb.AddForce(inputDirection.normalized * slideForce, ForceMode.Force);
+            rb.AddForce(inputDirection.normalized * slideMoveForce, ForceMode.Force);
+            rb.AddForce(Vector3.down * Time.deltaTime * slideDownForce);
+
+            pm.currentSlideSpeed = Mathf.Lerp(pm.currentSlideSpeed, 0f, slideSpeedDrain * Time.deltaTime);
 
             if (slideTimeLimit) slideTimer -= Time.deltaTime;
         }
@@ -83,11 +95,16 @@ public class Sliding : MonoBehaviour
         // sliding down a slope
         else
         {
-            rb.AddForce(pm.GetSlopeMoveDirection(inputDirection) * slideForce, ForceMode.Force);
+            rb.AddForce(pm.GetSlopeMoveDirection(inputDirection) * slideMoveForce, ForceMode.Force);
+            rb.AddForce(Vector3.down * Time.deltaTime * slideDownForce);
+
+            pm.currentSlideSpeed = Mathf.Lerp(pm.currentSlideSpeed, pm.slideSlopeSpeed, slideSpeedGain * Time.deltaTime);
         }
 
         if (slideTimer <= 0)
             StopSlide();
+
+        Debug.Log(rb.velocity.magnitude);
     }
 
     /// <summary>
