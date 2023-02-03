@@ -6,9 +6,10 @@ using TMPro;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("Enemy Settings")]
+    [Header("Enemy Combat")]
     [SerializeField] private EnemyType type;
     [SerializeField] private int health;
+    [SerializeField] private EnemyGun gun;
 
     [Header("Path Finding")]
     [SerializeField] private LayerMask whatIsGround;
@@ -149,7 +150,7 @@ public class Enemy : MonoBehaviour
 
         if (!alreadyAttacked) 
         {
-            // Attack the player
+            gun.Shoot();
 
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
