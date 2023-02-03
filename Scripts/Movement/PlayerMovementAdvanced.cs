@@ -6,33 +6,35 @@ public class PlayerMovementAdvanced : MonoBehaviour
 {
     [Header("Movement")]
     private float moveSpeed;
-    public float desiredMoveSpeed;
+    private float desiredMoveSpeed;
     private float lastDesiredMoveSpeed;
-    [SerializeField] private float walkSpeed;
-    [SerializeField] private float sprintSpeed;
-    [SerializeField] private float slideSpeed;
-    [SerializeField] private float wallrunSpeed;
-    [SerializeField] private float climbSpeed;
-    [SerializeField] private float dashSpeed;
-    [SerializeField] private float dashSpeedChangeFactor;
-    [SerializeField] private float swingSpeed;
+    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float sprintSpeed = 8f;
+    public float slideGroundSpeed = 8f;
+    public float slideSlopeSpeed = 20f;
+    [SerializeField] private float wallrunSpeed = 13f;
+    [SerializeField] private float climbSpeed = 3f;
+    [SerializeField] private float dashSpeed = 15f;
+    [SerializeField] private float dashSpeedChangeFactor = 50f;
+    [SerializeField] private float swingSpeed = 13f;
     private float speedChangeFactor;
+    public float currentSlideSpeed;
 
-    [SerializeField] private float speedIncreaseMultiplier;
-    [SerializeField] private float slopeIncreaseMultiplier;
+    [SerializeField] private float speedIncreaseMultiplier = 1f;
+    [SerializeField] private float slopeIncreaseMultiplier = 1.3f;
 
-    [SerializeField] private float groundDrag;
+    [SerializeField] private float groundDrag = 5f;
     [HideInInspector] public float maxYSpeed;
 
     [Header("Jumping")]
-    [SerializeField] private float jumpForce;
-    [SerializeField] private float jumpCooldown;
-    [SerializeField] private float airMultiplier;
+    [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private float jumpCooldown = .5f;
+    [SerializeField] private float airMultiplier = 1f;
     private bool readyToJump;
 
     [Header("Crouching")]
-    [SerializeField] private float crouchSpeed;
-    [SerializeField] private float crouchYScale;
+    [SerializeField] private float crouchSpeed = 3f;
+    [SerializeField] private float crouchYScale = .5f;
     private float startYScale;
 
     [Header("Keybinds")]
@@ -41,12 +43,12 @@ public class PlayerMovementAdvanced : MonoBehaviour
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
-    [SerializeField] private float playerHeight;
+    [SerializeField] private float playerHeight = 2f;
     [SerializeField] private LayerMask whatIsGround;
     public bool grounded;
 
     [Header("Slope Handling")]
-    [SerializeField] private float maxSlopeAngle;
+    [SerializeField] private float maxSlopeAngle = 45f;
     private RaycastHit slopeHit;
     private bool exitingSlope;
 
@@ -225,13 +227,12 @@ public class PlayerMovementAdvanced : MonoBehaviour
         // sliding
         else if (sliding)
         {
-            // increases speed by 1 every second
-            if (OnSlope()) // && rb.velocity.y < 0.1f
+            if (OnSlope())
             {
                 state = MovementState.sliding;
-                keepMomentum = true;
+                //keepMomentum = true;
             }
-            desiredMoveSpeed = slideSpeed;
+            desiredMoveSpeed = currentSlideSpeed;
             playerCamera.HandleFov(slideFov, .2f);
         }
 
