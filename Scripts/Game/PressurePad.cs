@@ -5,26 +5,46 @@ using UnityEngine;
 public class PressurePad : MonoBehaviour
 {
     [Header("Pressure pad settings")]
-    [SerializeField] private bool pressed;
     [SerializeField] private List<Door> doors = new List<Door>();
+
+    private List<Rigidbody> pressObjects;
+
+    private void Start()
+    {
+        pressObjects = new List<Rigidbody>();
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.GetComponent<Rigidbody>() != null)
-            pressed = true;
+        Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
 
-        foreach (Door d in doors)
-            d.ToggleDoor(true);
+        if (rb != null)
+            pressObjects.Add(rb);
+
+        UpdateDoors();
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.GetComponent<Rigidbody>() != null)
-            pressed = false;
+        Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
 
-        foreach (Door d in doors)
-            d.ToggleDoor(false);
+        if (rb != null)
+            pressObjects.Remove(rb);
+
+        UpdateDoors();
     }
 
-    public bool IsPressed() { return pressed; }
+    private void UpdateDoors()
+    {
+        if (IsPressed())
+            foreach (Door d in doors)
+                d.ToggleDoor(true);
+        else
+            foreach (Door d in doors)
+                d.ToggleDoor(false);
+    }
+
+    public bool IsPressed() {
+        return pressObjects.Count > 0;
+    }
 }
