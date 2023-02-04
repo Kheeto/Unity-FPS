@@ -9,7 +9,7 @@ public class EndPortal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.parent == player)
+        if (other.transform == player)
         {
             menuManager.ShowEndMenu();
         }
