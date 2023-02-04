@@ -82,10 +82,9 @@ public class Sliding : MonoBehaviour
         Vector3 inputDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         // sliding on a flat surface
-        if(!pm.OnSlope() || rb.velocity.y > -0.1f)
+        if (!pm.OnSlope())
         {
             rb.AddForce(inputDirection.normalized * slideMoveForce, ForceMode.Force);
-            rb.AddForce(Vector3.down * Time.deltaTime * slideDownForce);
 
             pm.currentSlideSpeed = Mathf.Lerp(pm.currentSlideSpeed, 0f, slideSpeedDrain * Time.deltaTime);
 
