@@ -99,12 +99,6 @@ public class Gun : MonoBehaviour
         bulletsShot--;
         Invoke("ResetShot", fireRate);
 
-        if (infiniteAmmo)
-        {
-            Invoke("Shoot", timeBetweenBullets);
-            return;
-        }
-
         if (bulletsShot > 0 && bulletsLeft > 0)
             Invoke("Shoot", timeBetweenBullets);
     }
