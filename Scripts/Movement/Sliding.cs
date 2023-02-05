@@ -67,11 +67,12 @@ public class Sliding : MonoBehaviour
         pm.sliding = true;
 
         playerObj.localScale = new Vector3(playerObj.localScale.x, slideYScale, playerObj.localScale.z);
-        rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+        //rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
 
         slideTimer = maxSlideTime;
 
-        pm.currentSlideSpeed = pm.slideGroundSpeed;
+        if (pm.grounded) pm.currentSlideSpeed = pm.slideGroundSpeed;
+        else pm.currentSlideSpeed = pm.airSpeed;
     }
 
     /// <summary>
@@ -79,6 +80,8 @@ public class Sliding : MonoBehaviour
     /// </summary>
     private void SlidingMovement()
     {
+        if (!pm.grounded) return;
+
         Vector3 inputDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         // sliding on a flat surface
