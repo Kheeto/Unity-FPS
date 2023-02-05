@@ -17,6 +17,7 @@ public class Gun : MonoBehaviour
     private bool shooting, readyToShoot, reloading;
 
     [Header("Ammo")]
+    [SerializeField] private bool infiniteAmmo;
     [SerializeField] private int magazineSize;
     [SerializeField] private int bulletsPerTap;
     [SerializeField] private bool automatic;
@@ -57,8 +58,10 @@ public class Gun : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) && bulletsLeft < magazineSize && !reloading) Reload();
 
         //Shoot
-        if (readyToShoot && shooting && !reloading && bulletsLeft > 0)
+        if (readyToShoot && shooting && !reloading)
         {
+            if (!infiniteAmmo && bulletsLeft <= 0) return;
+
             bulletsShot = bulletsPerTap;
             Shoot();
         }
@@ -95,6 +98,12 @@ public class Gun : MonoBehaviour
         bulletsLeft--;
         bulletsShot--;
         Invoke("ResetShot", fireRate);
+
+        if (infiniteAmmo)
+        {
+            Invoke("Shoot", timeBetweenBullets);
+            return;
+        }
 
         if (bulletsShot > 0 && bulletsLeft > 0)
             Invoke("Shoot", timeBetweenBullets);
