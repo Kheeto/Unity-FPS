@@ -17,6 +17,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
     [SerializeField] private float dashSpeed = 15f;
     [SerializeField] private float dashSpeedChangeFactor = 50f;
     [SerializeField] private float swingSpeed = 13f;
+    public float airSpeed = 10f;
     private float speedChangeFactor;
     public float currentSlideSpeed;
 
@@ -263,10 +264,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
         {
             if(!wallrunning) state = MovementState.air;
 
-            if (desiredMoveSpeed < sprintSpeed)
-                desiredMoveSpeed = walkSpeed;
-            else
-                desiredMoveSpeed = sprintSpeed;
+            desiredMoveSpeed = airSpeed;
         }
 
         if (grounded && !dashing && !Input.GetKey(sprintKey) && !activeGrapple && !sliding)
