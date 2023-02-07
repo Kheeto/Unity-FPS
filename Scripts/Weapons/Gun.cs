@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using EZCameraShake;
+using System.Collections.Generic;
 
 public class Gun : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private float timeBetweenBullets;
     [SerializeField] private LayerMask whatIsEnemy;
     private RaycastHit rayHit;
-    private bool shooting, readyToShoot, reloading;
+    private bool shooting, readyToShoot, reloading, recoilAnim;
 
     [Header("Ammo")]
     [SerializeField] private bool infiniteAmmo;
@@ -35,6 +36,10 @@ public class Gun : MonoBehaviour
     [SerializeField] private Camera camera;
     [SerializeField] private Transform gunMuzzle;
     [SerializeField] private GameObject muzzleFlash, bulletHoleGraphic;
+    [SerializeField] private Animator animator;
+
+    [Header("Audio")]
+    [SerializeField] private List<AudioSource> shootSounds = new List<AudioSource>();
 
     private void Awake()
     {
@@ -44,7 +49,10 @@ public class Gun : MonoBehaviour
     private void Update()
     {
         MyInput();
+
         if (!infiniteAmmo) ammoText.SetText(bulletsLeft + " / " + magazineSize);
+        if (animator != null)
+            animator.SetBool("shooting", recoilAnim);
     }
 
     /// <summary>
@@ -97,10 +105,15 @@ public class Gun : MonoBehaviour
 
         bulletsLeft--;
         bulletsShot--;
-        Invoke("ResetShot", fireRate);
+        Invoke(nameof(ResetShot), fireRate);
 
         if (bulletsShot > 0 && bulletsLeft > 0)
-            Invoke("Shoot", timeBetweenBullets);
+            Invoke(nameof(Shoot), timeBetweenBullets);
+
+        recoilAnim = true;
+        Invoke(nameof(ResetRecoilAnimation), .1f);
+
+        shootSounds[Random.Range(0, shootSounds.Count)].Play();
     }
     private void ResetShot()
     {
@@ -111,6 +124,11 @@ public class Gun : MonoBehaviour
     {
         reloading = true;
         Invoke("ReloadFinished", reloadTime);
+    }
+
+    private void ResetRecoilAnimation()
+    {
+        recoilAnim = false;
     }
 
     private void ReloadFinished()
