@@ -50,9 +50,13 @@ public class Gun : MonoBehaviour
     {
         MyInput();
 
-        if (!infiniteAmmo) ammoText.SetText(bulletsLeft + " / " + magazineSize);
+        if (!infiniteAmmo) ammoText.SetText(bulletsLeft);
+
         if (animator != null)
+        {
             animator.SetBool("shooting", recoilAnim);
+            animator.SetBool("reloading", reloading);
+        }
     }
 
     /// <summary>
