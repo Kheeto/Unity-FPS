@@ -50,7 +50,7 @@ public class Gun : MonoBehaviour
     {
         MyInput();
 
-        if (!infiniteAmmo) ammoText.SetText(bulletsLeft);
+        if (!infiniteAmmo) ammoText.SetText(bulletsLeft.ToString());
 
         if (animator != null)
         {
