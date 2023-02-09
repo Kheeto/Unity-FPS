@@ -103,7 +103,11 @@ public class Gun : MonoBehaviour
         if (cameraShake) 
             CameraShaker.Instance.ShakeOnce(shakeMagnitude, shakeRoughness, fadeInTime, fadeOutTime);
         if (bulletHoleGraphic != null)
-            Instantiate(bulletHoleGraphic, rayHit.point, Quaternion.Euler(0, 180f, 0));
+        {
+            Instantiate(bulletHoleGraphic,
+                rayHit.point + (rayHit.normal * .01f),
+                Quaternion.FromToRotation(Vector3.up, rayHit.normal));
+        }
         if (muzzleFlash != null)
             Instantiate(muzzleFlash, gunMuzzle.position, camera.transform.rotation, gunMuzzle);
 
