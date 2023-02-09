@@ -15,7 +15,7 @@ public class CameraRecoil : MonoBehaviour
     private void Update()
     {
         targetRot = Vector3.Lerp(targetRot, Vector3.zero, returnSpeed * Time.deltaTime);
-        currentRot = Vector3.Slerp(currentRot, targetRot, roughness * Time.fixedDeltaTime);
+        currentRot = Vector3.Slerp(currentRot, targetRot, roughness * Time.deltaTime);
 
         transform.localRotation = Quaternion.Euler(currentRot);
     }
