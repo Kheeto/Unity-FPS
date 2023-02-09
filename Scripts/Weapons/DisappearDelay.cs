@@ -2,19 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MuzzleFlash : MonoBehaviour
+public class DisappearDelay : MonoBehaviour
 {
     [SerializeField] private float duration;
 
     private void OnEnable()
     {
-        Invoke(nameof(EndMuzzleFlash), duration);
+        Invoke(nameof(Disappear), duration);
     }
 
     /// <summary>
-    /// Destroys the muzzleflash object after a certain duration.
+    /// Destroys the gameobject object after a certain duration.
     /// </summary>
-    private void EndMuzzleFlash()
+    private void Disappear()
     {
         Destroy(gameObject);
     }
