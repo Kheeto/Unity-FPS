@@ -34,6 +34,7 @@ public class Gun : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Camera camera;
+    [SerializeField] private CameraRecoil recoil;
     [SerializeField] private Transform gunMuzzle;
     [SerializeField] private GameObject muzzleFlash, bulletHoleGraphic;
     [SerializeField] private Animator animator;
@@ -122,6 +123,8 @@ public class Gun : MonoBehaviour
         Invoke(nameof(ResetRecoilAnimation), .1f);
 
         shootSounds[Random.Range(0, shootSounds.Count)].Play();
+
+        recoil.ApplyRecoil();
     }
     private void ResetShot()
     {
