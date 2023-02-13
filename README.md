@@ -1,5 +1,5 @@
 # Unity-FPS
-Advanced FPS game prototype
+Prototype scripts with movement and combat for an fps parkour game
 
 **Player movement**<br>
 - Sliding
