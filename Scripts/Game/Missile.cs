@@ -28,7 +28,7 @@ public class Missile : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.AddForce(transform.forward * thrust * Time.fixedDeltaTime);
+        rb.AddForce(transform.forward * thrust, ForceMode.Force);
 
         // Predict player's movement
         float leadTimePercentage = Mathf.InverseLerp(minPredictionDistance, maxRange,
@@ -37,7 +37,8 @@ public class Missile : MonoBehaviour
         prediction = target.position + target.velocity * predictionTime;
 
         // Rotate missile
-        Quaternion targetRotation = Quaternion.LookRotation(player.position);
+        Vector3 heading = prediction - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(heading);
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, targetRotation,
             turnSpeed * Time.fixedDeltaTime));
     }
