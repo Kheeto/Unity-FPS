@@ -5,21 +5,27 @@ using UnityEngine;
 public class WeaponSway : MonoBehaviour
 {
     [Header("Weapon Sway")]
-    [SerializeField] private float swayAmount = .1f;
-    [SerializeField] private float swayMaxAmount = .2f;
+    [SerializeField] private float lookSwayMultiplier = .1f;
+    [SerializeField] private float lookSwayMax = .2f;
+    [SerializeField] private float movementSwayMultiplier = .01f;
+    [SerializeField] private float movementSwayMax = .3f;
+    [SerializeField] private float movementSwayLerp = 2f;
     [SerializeField] private float smoothSpeed = 6f;
     private Vector3 initialPosition;
 
     [Header("Weapon Tilt")]
-    [SerializeField] private float tiltAmount = 4f;
+    [SerializeField] private float lookTiltAmount = 4f;
+    [SerializeField] private float movementTiltAmount = .5f;
     [SerializeField] private float tiltMaxAmount = 6f;
     [SerializeField] private float tiltSpeed = 12f;
     private Quaternion initialRotation;
-
     [Space]
     [SerializeField] private bool tiltX;
     [SerializeField] private bool tiltY;
     [SerializeField] private bool tiltZ;
+
+    [Header("References")]
+    [SerializeField] private Rigidbody rb;
 
     private void Awake()
     {
@@ -34,15 +40,29 @@ public class WeaponSway : MonoBehaviour
         HandleTilt(input.x, input.y);
     }
 
+    private Vector3 movementSway;
     /// <summary>
-    /// Moves the weapon towards the opposite direction of where the player is looking.
+    /// Moves the weapon towards the opposite direction of where the player is looking and moving
     /// </summary>
     private void HandleSway(float xInput, float yInput)
     {
-        float xMovement = Mathf.Clamp(xInput * swayAmount, -swayMaxAmount, swayMaxAmount);
-        float yMovement = Mathf.Clamp(yInput * swayAmount, -swayMaxAmount, swayMaxAmount);
+        // Look sway
+        float xLook = Mathf.Clamp(xInput * lookSwayMultiplier, -lookSwayMax, lookSwayMax);
+        float yLook = Mathf.Clamp(yInput * lookSwayMultiplier, -lookSwayMax, lookSwayMax);
 
-        Vector3 finalPosition = new Vector3(xMovement, yMovement, 0f);
+        // Movement sway
+        Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
+        movementSway.x = Mathf.Lerp(movementSway.x, Mathf.Clamp(localVelocity.x * movementSwayMultiplier,
+            -movementSwayMax, movementSwayMax), movementSwayLerp * Time.deltaTime);
+        movementSway.y = Mathf.Lerp(movementSway.y, Mathf.Clamp(localVelocity.y * movementSwayMultiplier,
+            -movementSwayMax, movementSwayMax), movementSwayLerp * Time.deltaTime);
+        movementSway.z = Mathf.Lerp(movementSway.z, Mathf.Clamp(localVelocity.z * movementSwayMultiplier,
+            -movementSwayMax, movementSwayMax), movementSwayLerp * Time.deltaTime);
+
+        Vector3 finalPosition = new Vector3(
+            movementSway.x + xLook,
+            movementSway.y + yLook,
+            movementSway.z);
         transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosition + initialPosition, smoothSpeed * Time.deltaTime);
     }
 
@@ -51,13 +71,27 @@ public class WeaponSway : MonoBehaviour
     /// </summary>
     private void HandleTilt(float xInput, float yInput)
     {
-        float yTilt = Mathf.Clamp(xInput * tiltAmount, -tiltMaxAmount, tiltMaxAmount);
-        float xTilt = Mathf.Clamp(yInput * tiltAmount, -tiltMaxAmount, tiltMaxAmount);
+        // Look tilt
+        float yLookTilt = Mathf.Clamp(xInput * lookTiltAmount, -tiltMaxAmount, tiltMaxAmount);
+        float xLookTilt = -Mathf.Clamp(yInput * lookTiltAmount, -tiltMaxAmount, tiltMaxAmount);
+
+        // Movement tilt
+        Vector3 localVelocity = transform.InverseTransformDirection(rb.velocity);
+        float xMovement = Mathf.Clamp(localVelocity.y * movementTiltAmount,
+            -tiltMaxAmount, tiltMaxAmount) + Mathf.Clamp(localVelocity.z * movementTiltAmount,
+            -tiltMaxAmount, tiltMaxAmount);
+        float zMovement = -Mathf.Clamp(localVelocity.x * movementTiltAmount,
+            -tiltMaxAmount, tiltMaxAmount);
+
+        Vector3 tilt = new Vector3(
+            xMovement + xLookTilt,
+            yLookTilt,
+            zMovement);
 
         Quaternion finalRotation = Quaternion.Euler(new Vector3(
-            tiltX ? -xTilt : 0f,
-            tiltY ? yTilt : 0f,
-            tiltZ ? yTilt : 0f
+            tiltX ? tilt.x : 0f,
+            tiltY ? tilt.y : 0f,
+            tiltZ ? tilt.z : 0f
         ));
         transform.localRotation = Quaternion.Slerp(transform.localRotation, finalRotation * initialRotation, tiltSpeed * Time.deltaTime);
     }
