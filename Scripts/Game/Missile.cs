@@ -13,6 +13,9 @@ public class Missile : MonoBehaviour
     [SerializeField] private float minPredictionDistance = 5f;
     [SerializeField] private float maxPredictionTime = 5f;
 
+    [Header("References")]
+    [SerializeField] private GameObject explosionPrefab;
+
     private Vector3 prediction;
     private Rigidbody rb;
     private Rigidbody target;
@@ -55,5 +58,11 @@ public class Missile : MonoBehaviour
 
         Gizmos.color = Color.green;
         Gizmos.DrawLine(transform.position, prediction);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        Destroy(gameObject);
     }
 }
