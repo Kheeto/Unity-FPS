@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerMovementAdvanced : MonoBehaviour
 {
+    public static PlayerMovementAdvanced Instance { get; private set; }
+
     [Header("Movement")]
     private float moveSpeed;
     private float desiredMoveSpeed;
@@ -101,6 +103,11 @@ public class PlayerMovementAdvanced : MonoBehaviour
         air,
         grappling,
         swinging
+    }
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
     }
 
     private void Start()
@@ -494,4 +501,6 @@ public class PlayerMovementAdvanced : MonoBehaviour
 
         return velocityXZ + velocityY;
     }
+
+    public Rigidbody GetRigidbody() { return rb; }
 }
